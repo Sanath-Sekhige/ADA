@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <limits.h>
-#include <time.h>
 
 #define MAX 10
 #define INF INT_MAX
@@ -52,9 +51,7 @@ int main() {
     printf("Enter starting vertex (0 to %d): ", n - 1);
     scanf("%d", &start);
 
-    clock_t begin = clock();
     dijkstra(dist, start, n);
-    clock_t end = clock();
 
     printf("\nShortest distances from vertex %d:\n", start);
     for (int i = 0; i < n; i++) {
@@ -64,9 +61,6 @@ int main() {
         else
             printf("To %d: %d\n", i, dist[i]);
     }
-
-    double time = (double)(end - begin) / CLOCKS_PER_SEC;
-    printf("\nExecution time: %.6f seconds\n", time);
 
     return 0;
 }

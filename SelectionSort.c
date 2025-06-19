@@ -37,7 +37,11 @@ int main() {
     
     fclose(fp);
     pipe = popen("gnuplot --persist", "w");
-    fprintf(pipe, "set title 'Selection Sort Runtime'; set ylabel 'Time (s)'; set xlabel 'Input Size'; plot 'Sorting.txt' using 1:2 title 'Selection Sort' with linespoints\n");
+    fprintf(pipe, "set title 'Selection Sort Runtime'; \
+               set ylabel 'Time (s)'; \
+               set xlabel 'Input Size'; \
+               plot 'Sorting.txt' using 1:2 title 'Selection Sort' with linespoints\n");
+
     fclose(pipe);
     return 0;
 }
