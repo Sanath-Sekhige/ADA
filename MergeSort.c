@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/time.h>
+#include <time.h>
 
 void merge(int a[], int b[], int low, int mid, int high) {
     int i = low, h = low, j = mid + 1;
@@ -10,48 +10,46 @@ void merge(int a[], int b[], int low, int mid, int high) {
     for (i = low; i <= high; i++) a[i] = b[i];
 }
 
-void merge_sort(int a[], int b[], int low, int high) {
+void mergeSort(int a[], int b[], int low, int high) {
     if (low < high) {
         int mid = (low + high) / 2;
-        merge_sort(a, b, low, mid);
-        merge_sort(a, b, mid + 1, high);
+        mergeSort(a, b, low, mid);
+        mergeSort(a, b, mid + 1, high);
         merge(a, b, low, mid, high);
     }
 }
 
-double get_time() {
-    struct timeval t;
-    gettimeofday(&t, NULL);
-    return t.tv_sec + (t.tv_usec / 1000000.0);
+double measureTime(int a[], int b[], int n) {
+    clock_t start = clock();
+    mergeSort(a, b, 0, n - 1);
+    return (double)(clock() - start) / CLOCKS_PER_SEC;
 }
 
-void fill_array(int a[], int n, int mode) {
+void generateArray(int a[], int n, int type) {
     for (int i = 0; i < n; i++)
-        a[i] = (mode == 0) ? i : (mode == 1) ? rand() % 100000 : n - i;
+        a[i] = (type == 1) ? i : (type == 0) ? rand() % 100000 : n - i;
 }
 
 int main() {
+    srand(time(NULL));
+    FILE *fp = fopen("merge_sort_data.txt", "w");
+    fprintf(fp, "Size\tBest\tAvg\tWorst\n");
+
     int a[100000], b[100000];
-    FILE *fp = fopen("Sorting.txt", "w");
-    
-    printf("\nItems\tBest Case\tAverage Case\tWorst Case\n");
-    for (int n = 10000; n <= 80000; n *= 2) {
-        double times[3];
-        for (int i = 0; i < 3; i++) {
-            fill_array(a, n, i);
-            double start = get_time();
-            merge_sort(a, b, 0, n - 1);
-            times[i] = get_time() - start;
-        }
-        printf("%d\t%lf\t%lf\t%lf\n", n, times[0], times[1], times[2]);
-        fprintf(fp, "%d\t%lf\t%lf\t%lf\n", n, times[0], times[1], times[2]);
+    for (int n = 1000; n <= 80000; n *= 2) {
+        generateArray(a, n, 1); double best = measureTime(a, b, n);
+        generateArray(a, n, 0); double avg = measureTime(a, b, n);
+        generateArray(a, n, 2); double worst = measureTime(a, b, n);
+        fprintf(fp, "%d\t%.6lf\t%.6lf\t%.6lf\n", n, best, avg, worst);
     }
     fclose(fp);
-    printf("\nData written to 'Sorting.txt'.\n");
-    
-    FILE *pipe = popen("gnuplot --persist", "w");
-    fprintf(pipe, "set title 'Runtime Analysis of Merge Sort';\nset xlabel 'Items';\nset ylabel 'Time (seconds)';\n");
-    fprintf(pipe, "plot 'Sorting.txt' using 1:2 with lines title 'Best', 'Sorting.txt' using 1:3 with lines title 'Avg', 'Sorting.txt' using 1:4 with lines title 'Worst'\n");
-    fclose(pipe);
+
+    FILE *gp = popen("gnuplot -persist", "w");
+    fprintf(gp, "set title 'Merge Sort Runtime'; \
+                set ylabel 'Time(s)'; \
+                set xlabel 'Input Size'; \
+                plot for [i=2:4] 'merge_sort_data.txt' using 1:i title columnheader(i) with lines\n");
+    fclose(gp);
+
     return 0;
 }

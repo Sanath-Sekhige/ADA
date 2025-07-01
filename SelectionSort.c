@@ -4,7 +4,6 @@
 #include <time.h>
 
 void generate_random(int arr[], int n) {
-    srand(time(0));
     for (int i = 0; i < n; i++) arr[i] = rand() % 100000;
 }
 
@@ -20,6 +19,7 @@ void selection_sort(int arr[], int n) {
 }
 
 int main() {
+    srand(time(0));
     int arr[100000];
     struct timeval t;
     FILE *fp = fopen("Sorting.txt", "w"), *pipe;
@@ -36,7 +36,7 @@ int main() {
     }
     
     fclose(fp);
-    pipe = popen("gnuplot --persist", "w");
+    pipe = popen("gnuplot -persist", "w");
     fprintf(pipe, "set title 'Selection Sort Runtime'; \
                set ylabel 'Time (s)'; \
                set xlabel 'Input Size'; \

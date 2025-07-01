@@ -15,11 +15,11 @@ int partition(int a[], int low, int high) {
     return j;
 }
 
-void quickSort(int a[], int low, int high) {
+void quickSort(int arr[], int low, int high) {
     if (low < high) {
-        int p = partition(a, low, high);
-        quickSort(a, low, p - 1);
-        quickSort(a, p + 1, high);
+        int p = partition(arr, low, high);
+        quickSort(arr, low, p - 1);
+        quickSort(arr, p + 1, high);
     }
 }
 
@@ -30,28 +30,30 @@ void generateArray(int arr[], int n, int type) {
 }
 
 double measureTime(int arr[], int n) {
-    clock_t start = clock();
+    double start = clock();
     quickSort(arr, 0, n - 1);
     return (double)(clock() - start) / CLOCKS_PER_SEC;
 }
 
 int main() {
     srand(time(NULL));
-    FILE *fp = fopen("quick_sort_data.txt", "w");
-    fprintf(fp, "Size BestCase AvgCase WorstCase\n");
+    FILE *fp = fopen("Sorting.txt", "w");
+    fprintf(fp, "Size\tBest\tAvg\tWorst\n");
 
     for (int n = 100; n <= 5000; n += 100) {
         int arr[n];
         generateArray(arr, n, 1); double best = measureTime(arr, n);
         generateArray(arr, n, 0); double avg = measureTime(arr, n);
         generateArray(arr, n, 2); double worst = measureTime(arr, n);
-        fprintf(fp, "%d %.6f %.6f %.6f\n", n, best, avg, worst);
+        fprintf(fp, "%d\t%.6lf\t%.6lf\t%.6lf\n", n, best, avg, worst);
     }
     fclose(fp);
 
-    FILE *gp = popen("gnuplot -persistent", "w");
-    fprintf(gp, "set title 'Quick Sort Performance'\nset xlabel 'Size'\nset ylabel 'Time (s)'\n");
-    fprintf(gp, "plot for [i=2:4] 'quick_sort_data.txt' using 1:i title columnheader(i) with lines\n");
-
+    FILE* gp = popen("gnuplot -persist", "w");
+    fprintf(gp, "set title 'Quick Sort Runtime'; \
+                set ylabel 'Time(s)'; \
+                set xlabel 'Input Size'; \
+                plot for [i=2:4] 'Sorting.txt' using 1:i title columnheader(i) with lines\n");
+    fclose(gp);
     return 0;
 }
