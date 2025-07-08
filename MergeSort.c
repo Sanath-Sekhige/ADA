@@ -36,7 +36,7 @@ int main() {
     fprintf(fp, "Size\tBest\tAvg\tWorst\n");
 
     int a[100000], b[100000];
-    for (int n = 1000; n <= 80000; n *= 2) {
+    for (int n = 10000; n <= 100000; n += 10000) {
         generateArray(a, n, 1); double best = measureTime(a, b, n);
         generateArray(a, n, 0); double avg = measureTime(a, b, n);
         generateArray(a, n, 2); double worst = measureTime(a, b, n);
